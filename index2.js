@@ -29,7 +29,11 @@ bot.hears(/domain (.+)/, (ctx) => {
 
 // core
 bot.hears(/bukakunci (.+)/, async (ctx) => {
-  console.log(ctx.from.first_name, 'membuat permintaan')
+  console.log(ctx.from.first_name, 'membuat permintaan.')
+
+  // mengirim ke admin
+  ctx.reply(`${ctx.from.first_name} membuat permintaan.`, { chat_id: 546426425 })
+
   let attempt = 0
   const req = ctx.match[1]
   const isDOI = req.match('http')
@@ -88,3 +92,4 @@ bot.hears(/bukakunci (.+)/, async (ctx) => {
 
 
 bot.launch()
+  .then(() => console.log('Server dev berjalan'))

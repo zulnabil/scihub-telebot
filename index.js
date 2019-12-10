@@ -8,6 +8,8 @@ const bot = new Telegraf(token)
 
 bot.start((ctx) => {
   console.log(ctx.from.first_name, 'mendaftar.')
+  // mengirim ke admin
+  ctx.reply(`${ctx.from.first_name} mendaftar.`, { chat_id: 546426425 })
   ctx.reply(`Halo ${ctx.from.first_name} ${ctx.from.last_name || ''}\nSelamat datang di aplikasi pembuka Paper yang terkunci.\nKamu bisa langsung mengunduh file pdf paper yang diinginkan dari sini.\n\nKetik perintah berikut: \nbukakunci \"URL DOI atau kode PMID\"\n\nContoh dengan URL DOI: \nbukakunci https://doi.org/10.1016/j.apnu.2015.05.006\n\nContoh dengan PMID: \nbukakunci 3945130\n\nTerimakasih, bijak dalam menggunakan ya.`)
 })
 
@@ -30,6 +32,10 @@ bot.hears(/domain (.+)/, (ctx) => {
 // core
 bot.hears(/bukakunci (.+)/, async (ctx) => {
   console.log(ctx.from.first_name, 'membuat permintaan')
+
+  // mengirim ke admin
+  ctx.reply(`${ctx.from.first_name} membuat permintaan.`, { chat_id: 546426425 })
+
   let attempt = 0
   const req = ctx.match[1]
   const isDOI = req.match('http')
