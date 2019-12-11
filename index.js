@@ -7,7 +7,8 @@ const token = '1055599150:AAE6WR-IKacoI_MOO5p0lBsb_SUfUN-KEVI'
 const bot = new Telegraf(token)
 
 bot.start((ctx) => {
-  console.log(ctx.from.first_name, 'mendaftar.')
+  const fullname = `${ctx.from.first_name}${ctx.from.last_name ? ' '+ctx.from.last_name : ''}`
+  console.log(fullname, 'mendaftar.')
   ctx.reply(`Halo ${ctx.from.first_name} ${ctx.from.last_name || ''}\nSelamat datang di aplikasi pembuka Paper yang terkunci.\nKamu bisa langsung mengunduh file pdf paper yang diinginkan dari sini.\n\nKetik perintah berikut: \nbuka \"Link paper atau DOI atau PMID\"\n\nContoh dengan Link paper: \nbuka https://www.sciencedirect.com/science/article/abs/pii/S0191886914003560\n\nContoh dengan DOI: \nbuka https://doi.org/10.1016/j.apnu.2015.05.006\n\nContoh dengan PMID: \nbuka 3945130\n\nTerimakasih, bijak dalam menggunakan ya.`, { disable_web_page_preview: true })
 })
 
@@ -59,6 +60,7 @@ const findTitle = (reqhtml) => {
 // core
 bot.hears(/buka (.+)/, async (ctx) => {
   // inisialisasi
+  const fullname = `${ctx.from.first_name}${ctx.from.last_name ? ' '+ctx.from.last_name : ''}`
   const user = ctx.from.first_name
   const req = ctx.match[1]
   let attempt = 0
@@ -83,9 +85,9 @@ bot.hears(/buka (.+)/, async (ctx) => {
   // mengirim ke user
   // ctx.reply('Menganalisa link...')
 
-  console.log(user, 'membuat permintaan.')
+  console.log(fullname, 'membuat permintaan.')
   // mengirim ke admin
-  ctx.reply(`${user} membuat permintaan.`, { chat_id: 546426425 })
+  ctx.reply(`${fullname} membuat permintaan.`, { chat_id: 546426425 })
 
   const sendDocument = (doc, requestBody) => {
     ctx.replyWithDocument(doc, { caption: '*Berhasil membuka!* silahkan unduh file papermu. Terimakasih sudah menggunakan *PembukaPaper*.', parse_mode: 'Markdown' })
