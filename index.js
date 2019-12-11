@@ -2,7 +2,7 @@ const Telegraf = require('telegraf')
 const axios = require('axios')
 const qs = require('querystring')
 
-const token = '943004924:AAHH0umsj_c4ktwI1ouckK6kASTUxV-YRdQ'
+const token = '1055599150:AAE6WR-IKacoI_MOO5p0lBsb_SUfUN-KEVI'
 
 const bot = new Telegraf(token)
 
