@@ -75,9 +75,9 @@ bot.hears(/buka (.+)/, async (ctx) => {
   const isDOI = req.match('doi.org')
   const isLink = req.match('http')
 
-  isDOI ? ctx.reply('Kamu mengirim URL DOI') :
+  isDOI ? ctx.reply('Kamu mengirim URL DOI\nMemproses paper...') :
   isLink ? (ctx.reply('Kamu mengirim link Paper\nMenganalisa link...')) :
-  ctx.reply('Kamu mengirim PMID')
+  ctx.reply('Kamu mengirim PMID\nMemproses paper...')
   
 
   // mengirim ke user
