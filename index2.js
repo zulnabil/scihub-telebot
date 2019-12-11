@@ -25,41 +25,81 @@ bot.hears(/domain (.+)/, (ctx) => {
     })
 })
 
+// dev
+bot.hears(/dev (.+)/, ctx => {
+  const regex = /https?:\/\/doi\.org(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&\(\)\*\+,;\=]*)?/
+  const req = ctx.match[1]
+  const PMID = req.match(/\/([^\/]+)\/?$/)[1]
+  console.log('wew')
+  axios.get(req)
+    .then(res => {
+      const find = res.data.match(regex)
+      find ? console.log(find[0]) : console.log(PMID)
+    })
+})
 
+// mencari doi di link, gunakan pmid jika tidak ditemukan
+const findDOIorPMID = (req, reqhtml) => {
+  const isDOI = req.match('doi.org')
+  const regex = /https?:\/\/doi\.org(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&\(\)\*\+,;\=]*)?/
+  const PMID = req.match(/\/([^\/]+)\/?$/)[1]
+  const find = reqhtml.match(regex)
+  return (
+    isDOI ? req :
+    find ? find[0] : PMID
+  )
+}
+
+// mencari title di res html
+const findTitle = (reqhtml) => {
+  const regex = /<title>((.|\n)*?)<\/title>/
+  const find = reqhtml.match(regex)
+  return find ? find[1] : null
+}
 
 // core
-bot.hears(/bukakunci (.+)/, async (ctx) => {
-  console.log(ctx.from.first_name, 'membuat permintaan.')
-
-  // mengirim ke admin
-  ctx.reply(`${ctx.from.first_name} membuat permintaan.`, { chat_id: 546426425 })
-
-  let attempt = 0
+bot.hears(/buka (.+)/, async (ctx) => {
+  // inisialisasi
+  const user = ctx.from.first_name
   const req = ctx.match[1]
-  const isDOI = req.match('http')
-  isDOI ? ctx.reply('Memproses paper dengan URL DOI: '+req) : ctx.reply('Memproses paper dengan PMID: '+req)
-  const requestBody = {
-    request: req
-  }
+  let attempt = 0
+  // const requestBody = {
+  //   request: detected
+  // }
   const config = {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   }
-  const regex = /<iframe src = \"(.*?)\" id = \"pdf\"><\/iframe>/
 
-  const sendDocument = (doc) => {
-    ctx.replyWithDocument(doc, { caption: 'Berhasil membuka! silahkan unduh file papermu. Terimakasih sudah menggunakan PembukaPaper.' })
-      .then(() => console.log(`Percobaan ke ${attempt+1} berhasil\nPermintaan ${ctx.from.first_name} selesai. File pdf telah dikirim.`))
+  // identifikasi input
+  const isDOI = req.match('doi.org')
+  const isLink = req.match('http')
+
+  isDOI ? ctx.reply('Kamu mengirim URL DOI') :
+  isLink ? (ctx.reply('Kamu mengirim link Paper\nMenganalisa link...')) :
+  ctx.reply('Kamu mengirim PMID')
+  
+
+  // mengirim ke user
+  // ctx.reply('Menganalisa link...')
+
+  console.log(user, 'membuat permintaan.')
+  // mengirim ke admin
+  ctx.reply(`${user} membuat permintaan.`, { chat_id: 546426425 })
+
+  const sendDocument = (doc, requestBody) => {
+    ctx.replyWithDocument(doc, { caption: '*Berhasil membuka!* silahkan unduh file papermu. Terimakasih sudah menggunakan *PembukaPaper*.', parse_mode: 'Markdown' })
+      .then(() => console.log(`Percobaan ke ${attempt+1} ${user} berhasil\nPermintaan ${user} selesai. File pdf telah dikirim.`))
       .catch(() => {
-        console.log(`Percobaan ke ${attempt+1} gagal`)
+        console.log(`Percobaan ke ${attempt+1} ${user} gagal`)
         attempt++
         if (attempt == 5) {
           ctx.reply('Tolong menunggu, server masih memproses.')
           fetchData(requestBody)
         }
         else if (attempt == 10) {
-          console.log(`Permintaan ${ctx.from.first_name} selesai. Data tidak ditemukan.`)
+          console.log(`Permintaan ${user} selesai. Data tidak dapat diproses.`)
           return ctx.reply('Maaf data tidak ditemukan, kamu boleh coba paper lain.')
         } else {
           fetchData(requestBody)
@@ -68,18 +108,42 @@ bot.hears(/bukakunci (.+)/, async (ctx) => {
   }
   
   const fetchData = (requestBody) => {
+    const regex = /<iframe src = \"(.*?)\" id = \"pdf\"><\/iframe>/
     axios.post('https://sci-hub.tw/', qs.stringify(requestBody), config)
       .then(res => {
         const found = res.data.match(regex)
-        console.log(`Mencoba membuka paper ${ctx.from.first_name} [${attempt+1}] ...`)
-        sendDocument(found[1])
+        console.log(`Mencoba membuka paper ${user} [${attempt+1}] ...`)
+        sendDocument(found[1], requestBody)
       })
       .catch(() => {
+        console.log(`Permintaan ${user} selesai. Data tidak ditemukan.`)
         ctx.reply('Maaf data tidak ditemukan, kamu boleh coba paper lain.')
       })
   }
 
-  fetchData(requestBody)
+  if (!req.match('http')) {
+    console.log(`Memproses paper ${user} dengan PMID: ${req}`)
+    fetchData({ request: req })
+  } else {
+    // get res html
+    axios.get(req)
+    .then(res => {
+      let resHTML = res.data
+      const detected = findDOIorPMID(req, resHTML)
+      const title = findTitle(resHTML)
+
+      if (!detected) {
+        ctx.reply(`Maaf paper tidak dapat diproses, kamu boleh coba yang lain.`)
+      } else {
+        const isDOIpriv = detected.match('http')
+        isDOIpriv ? console.log(`Memproses paper ${user} dengan URL DOI: ${detected}`) : console.log(`Memproses paper ${user} dengan PMID: ${detected}`)
+        isLink && !isDOI ? ctx.reply(`Memproses paper dengan judul: \n_${title}_`, { parse_mode: 'Markdown' }) : null
+        fetchData({ request: detected })
+      }
+    })
+  }
+
+  
 
   // link yg te bisa : 
   // https://dacemirror.sci-hub.tw/journal-article/f13751a25ec6729b175f067caed24bb3/10.1016@j.apnu.2015.05.006.pdf#view=FitH
