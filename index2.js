@@ -8,11 +8,10 @@ const bot = new Telegraf(token)
 
 bot.start((ctx) => {
   console.log(ctx.from.first_name, 'mendaftar.')
-  ctx.reply(`Halo ${ctx.from.first_name} ${ctx.from.last_name || ''}\nSelamat datang di aplikasi pembuka Paper yang terkunci.\nKamu bisa langsung mengunduh file pdf paper yang diinginkan dari sini.\n\nKetik perintah berikut: \nbukakunci \"URL DOI atau kode PMID\"\n\nContoh dengan URL DOI: \nbukakunci https://doi.org/10.1016/j.apnu.2015.05.006\n\nContoh dengan PMID: \nbukakunci 3945130\n\nTerimakasih, bijak dalam menggunakan ya.`)
+  ctx.reply(`Halo ${ctx.from.first_name} ${ctx.from.last_name || ''}\nSelamat datang di aplikasi pembuka Paper yang terkunci.\nKamu bisa langsung mengunduh file pdf paper yang diinginkan dari sini.\n\nKetik perintah berikut: \nbuka \"Link paper atau DOI atau PMID\"\n\nContoh dengan Link paper: \nbuka https://www.sciencedirect.com/science/article/abs/pii/S0191886914003560\n\nContoh dengan DOI: \nbuka https://doi.org/10.1016/j.apnu.2015.05.006\n\nContoh dengan PMID: \nbuka 3945130\n\nTerimakasih, bijak dalam menggunakan ya.`)
 })
 
-bot.help((ctx) => ctx.reply(`Selamat datang di aplikasi pembuka Paper yang terkunci.\nKamu bisa langsung mengunduh file pdf paper yang diinginkan dari sini.\n\nKetik perintah berikut: \nbukakunci \"URL DOI atau kode PMID\"\n\nContoh dengan URL DOI: \nbukakunci https://doi.org/10.1016/j.apnu.2015.05.006\n\nContoh dengan PMID: \nbukakunci 3945130\n\nTerimakasih, bijak dalam menggunakan ya.
-`))
+bot.help((ctx) => ctx.reply(`Halo ${ctx.from.first_name} ${ctx.from.last_name || ''}\nSelamat datang di aplikasi pembuka Paper yang terkunci.\nKamu bisa langsung mengunduh file pdf paper yang diinginkan dari sini.\n\nKetik perintah berikut: \nbuka \"Link paper atau DOI atau PMID\"\n\nContoh dengan Link paper: \nbuka https://www.sciencedirect.com/science/article/abs/pii/S0191886914003560\n\nContoh dengan DOI: \nbuka https://doi.org/10.1016/j.apnu.2015.05.006\n\nContoh dengan PMID: \nbuka 3945130\n\nTerimakasih, bijak dalam menggunakan ya.`))
 
 
 bot.hears(/domain (.+)/, (ctx) => {
