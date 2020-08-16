@@ -1,6 +1,8 @@
 const Telegraf = require('telegraf')
 const axios = require('axios')
 const qs = require('querystring')
+const express = require('express');
+const app = express();
 
 const token = process.env.TOKEN_PROD
 const bot = new Telegraf(token)
@@ -119,8 +121,3 @@ bot.hears(/buka (.+)/, async (ctx) => {
 
 bot.launch()
     .then(() => console.log('Server running'))
-
-module.exports = (req, res) => {
-  bot.launch()
-    .then(() => console.log('Server running'))
-}
