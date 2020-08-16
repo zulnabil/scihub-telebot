@@ -1,9 +1,11 @@
-const Telegraf = require('telegraf')
+// const Telegraf = require('telegraf')
 const axios = require('axios')
 const qs = require('querystring')
+const { Composer } = require('micro-bot')
 
 const token = process.env.TOKEN_PROD
-const bot = new Telegraf(token)
+const bot = new Composer(token)
+// const bot = new Telegraf(token)
 
 const admin_chat_id = 546426425
 
