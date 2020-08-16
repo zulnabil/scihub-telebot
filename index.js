@@ -1,11 +1,12 @@
 const Telegraf = require('telegraf')
 const axios = require('axios')
 const qs = require('querystring')
-
-const token = '1055599150:AAE6WR-IKacoI_MOO5p0lBsb_SUfUN-KEVI'
-
 const bot = new Telegraf(token)
 
+const token = process.env.TOKEN_PROD
+const admin_chat_id = 546426425
+
+// welcome message
 bot.start((ctx) => {
   const fullname = `${ctx.from.first_name}${ctx.from.last_name ? ' '+ctx.from.last_name : ''}`
   console.log(fullname, 'mendaftar.')
@@ -14,16 +15,6 @@ bot.start((ctx) => {
 
 bot.help((ctx) => ctx.reply(`Halo ${ctx.from.first_name} ${ctx.from.last_name || ''}\nSelamat datang di aplikasi pembuka Paper yang terkunci.\nKamu bisa langsung mengunduh file pdf paper yang diinginkan dari sini.\n\nKetik perintah berikut: \nbuka \"Link paper atau DOI atau PMID\"\n\nContoh dengan Link paper: \nbuka https://www.sciencedirect.com/science/article/abs/pii/S0191886914003560\n\nContoh dengan DOI: \nbuka https://doi.org/10.1016/j.apnu.2015.05.006\n\nContoh dengan PMID: \nbuka 3945130\n\nTerimakasih, bijak dalam menggunakan ya.`))
 
-
-bot.hears(/domain (.+)/, (ctx) => {
-  const req = ctx.match[1]
-  axios.get('https://api.indoxploit.or.id/domain/'+req)
-    .then(res => {
-      const info = res.data.data.whois
-      console.log(res.data.data.geolocation)
-      info ? ctx.reply(info) : ctx.reply('Data tidak ditemukan.')
-    })
-})
 
 // dev
 bot.hears(/dev (.+)/, ctx => {
@@ -38,7 +29,7 @@ bot.hears(/dev (.+)/, ctx => {
     })
 })
 
-// mencari doi di link, gunakan pmid jika tidak ditemukan
+// find url DOI, use PMID if DOI not found
 const findDOIorPMID = (req, reqhtml) => {
   const isDOI = req.match('doi.org')
   const regex = /https?:\/\/doi\.org(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&\(\)\*\+,;\=]*)?/
@@ -50,7 +41,7 @@ const findDOIorPMID = (req, reqhtml) => {
   )
 }
 
-// mencari title di res html
+// find title of paper
 const findTitle = (reqhtml) => {
   const regex = /<title>((.|\n)*?)<\/title>/
   const find = reqhtml.match(regex)
@@ -59,21 +50,18 @@ const findTitle = (reqhtml) => {
 
 // core
 bot.hears(/buka (.+)/, async (ctx) => {
-  // inisialisasi
+  // initial
   const fullname = `${ctx.from.first_name}${ctx.from.last_name ? ' '+ctx.from.last_name : ''}`
   const user = ctx.from.first_name
   const req = ctx.match[1]
   let attempt = 0
-  // const requestBody = {
-  //   request: detected
-  // }
   const config = {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   }
 
-  // identifikasi input
+  // identify input
   const isDOI = req.match('doi.org')
   const isLink = req.match('http')
 
@@ -81,13 +69,8 @@ bot.hears(/buka (.+)/, async (ctx) => {
   isLink ? (ctx.reply('Kamu mengirim link Paper\nMenganalisa link...')) :
   ctx.reply('Kamu mengirim PMID\nMemproses paper...')
   
-
-  // mengirim ke user
-  // ctx.reply('Menganalisa link...')
-
-  console.log(fullname, 'membuat permintaan.')
-  // mengirim ke admin
-  ctx.reply(`${fullname} membuat permintaan.`, { chat_id: 546426425 })
+  // send report to admin
+  ctx.reply(`${fullname} membuat permintaan.`, { chat_id: admin_chat_id })
 
   const sendDocument = (doc, requestBody) => {
     ctx.replyWithDocument(doc, { caption: '*Berhasil membuka!* silahkan unduh file papermu. Terimakasih sudah menggunakan *PembukaPaper*.', parse_mode: 'Markdown' })
@@ -126,6 +109,7 @@ bot.hears(/buka (.+)/, async (ctx) => {
     console.log(`Memproses paper ${user} dengan PMID: ${req}`)
     fetchData({ request: req })
   } else {
+
     // get res html
     axios.get(req)
     .then(res => {
@@ -143,18 +127,8 @@ bot.hears(/buka (.+)/, async (ctx) => {
       }
     })
   }
-
-  
-
-  // link yg te bisa : 
-  // https://dacemirror.sci-hub.tw/journal-article/f13751a25ec6729b175f067caed24bb3/10.1016@j.apnu.2015.05.006.pdf#view=FitH
-  // https://zero.sci-hub.tw/4498/f13751a25ec6729b175f067caed24bb3/10.1016@j.apnu.2015.05.006.pdf#view=FitH
-  // new https://zero.sci-hub.tw/4498/f13751a25ec6729b175f067caed24bb3/10.1016@j.apnu.2015.05.006.pdf?download=true
-
-  // link yg bsa : 
-  // https://moscow.sci-hub.tw/4498/f13751a25ec6729b175f067caed24bb3/10.1016@j.apnu.2015.05.006.pdf#view=FitH
 })
 
 
 bot.launch()
-  .then(() => console.log('Server prod berjalan'))
+  .then(() => console.log('Server running'))
