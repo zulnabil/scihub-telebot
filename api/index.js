@@ -5,7 +5,6 @@ const { Composer } = require('micro-bot')
 
 const token = process.env.TOKEN_PROD
 const bot = new Composer
-// const bot = new Telegraf(token)
 
 const admin_chat_id = 546426425
 
@@ -118,8 +117,5 @@ bot.hears(/buka (.+)/, async (ctx) => {
     })
   }
 })
-
-// bot.launch()
-//     .then(() => console.log('Server running'))
 
 module.exports = bot
