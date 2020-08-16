@@ -4,7 +4,7 @@ const qs = require('querystring')
 const { Composer } = require('micro-bot')
 
 const token = process.env.TOKEN_PROD
-const bot = new Composer(token)
+const bot = new Composer
 // const bot = new Telegraf(token)
 
 const admin_chat_id = 546426425
