@@ -125,5 +125,5 @@ bot.hears(/buka (.+)/, async (ctx) => {
 module.exports = (req, res) => {
   bot.launch()
     .then(() => console.log('Server running'))
-  // res.send('BOT RUNNING')
+  res.send('BOT RUNNING')
 }
