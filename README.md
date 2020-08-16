@@ -1,6 +1,7 @@
 # PembukaPaperBot
 
-PembukaPaperBot is a Telegram bot for unlock the undownloadable Publication Articles
+PembukaPaperBot is a Telegram bot for unlock the undownloadable Publication Articles.
+Works with scraping https://sci-hub.tw
 
 ## Installation
 
