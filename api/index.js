@@ -1,8 +1,6 @@
 const Telegraf = require('telegraf')
 const axios = require('axios')
 const qs = require('querystring')
-const express = require('express');
-const app = express();
 
 const token = process.env.TOKEN_PROD
 const bot = new Telegraf(token)
